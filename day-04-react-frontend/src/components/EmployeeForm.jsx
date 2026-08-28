@@ -1,7 +1,14 @@
-import { useState } from "react";
-import { addEmployee } from "../services/employeeService";
+import { useEffect, useState } from "react";
+import {
+  addEmployee,
+  updateEmployee,
+} from "../services/employeeService";
 
-function EmployeeForm({ onEmployeeSaved }) {
+function EmployeeForm({
+  selectedEmployee,
+  onEmployeeSaved,
+  onCancelEdit,
+}) {
   const [formData, setFormData] = useState({
     employeeCode: "",
     fullName: "",
@@ -14,6 +21,23 @@ function EmployeeForm({ onEmployeeSaved }) {
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  useEffect(() => {
+    if (selectedEmployee) {
+      setFormData({
+        employeeCode: selectedEmployee.employeeCode || "",
+        fullName: selectedEmployee.fullName || "",
+        email: selectedEmployee.email || "",
+        phone: selectedEmployee.phone || "",
+        department: selectedEmployee.department || "",
+        role: selectedEmployee.role || "",
+        status: selectedEmployee.status || "ACTIVE",
+      });
+
+      setError("");
+      setSuccess("");
+    }
+  }, [selectedEmployee]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -43,11 +67,13 @@ function EmployeeForm({ onEmployeeSaved }) {
     }
 
     try {
-      const savedEmployee = await addEmployee(formData);
-
-      console.log("Employee saved:", savedEmployee);
-
-      setSuccess("Employee added successfully!");
+      if (selectedEmployee) {
+        await updateEmployee(selectedEmployee.id, formData);
+        setSuccess("Employee updated successfully!");
+      } else {
+        await addEmployee(formData);
+        setSuccess("Employee added successfully!");
+      }
 
       setFormData({
         employeeCode: "",
@@ -59,24 +85,57 @@ function EmployeeForm({ onEmployeeSaved }) {
         status: "ACTIVE",
       });
 
-      onEmployeeSaved?.();
+      onEmployeeSaved();
     } catch (error) {
       setError(error.message);
     }
   };
-   
-  
+
+  const handleCancel = () => {
+    setFormData({
+      employeeCode: "",
+      fullName: "",
+      email: "",
+      phone: "",
+      department: "",
+      role: "",
+      status: "ACTIVE",
+    });
+
+    setError("");
+    setSuccess("");
+
+    onCancelEdit();
+  };
+
   return (
     <div className="card shadow-sm mb-4">
-      <div className="card-body">
-        <h3 className="card-title mb-4">Add Employee</h3>
 
+      <div className="card-body p-4">
+
+        {/* Form Header */}
+        <div className="mb-4">
+          <h3 className="card-title mb-1">
+            {selectedEmployee
+              ? "Edit Employee"
+              : "Add New Employee"}
+          </h3>
+
+          <p className="text-muted mb-0">
+            {selectedEmployee
+              ? "Update employee information"
+              : "Enter employee details below"}
+          </p>
+        </div>
+
+        {/* Error */}
         {error && (
           <div className="alert alert-danger">
             {error}
           </div>
         )}
 
+        {/* Success */}
         {success && (
           <div className="alert alert-success">
             {success}
@@ -85,128 +144,151 @@ function EmployeeForm({ onEmployeeSaved }) {
 
         <form onSubmit={handleSubmit}>
 
-          {/* Employee Code */}
-          <div className="mb-3">
-            <label className="form-label">
-              Employee Code
-            </label>
+          <div className="row g-3">
 
-            <input
-              type="text"
-              name="employeeCode"
-              className="form-control"
-              value={formData.employeeCode}
-              onChange={handleChange}
-              placeholder="Example: SJC-105"
-            />
+            {/* Employee Code */}
+            <div className="col-md-6">
+              <label className="form-label">
+                Employee Code
+              </label>
+
+              <input
+                type="text"
+                name="employeeCode"
+                className="form-control"
+                value={formData.employeeCode}
+                onChange={handleChange}
+                placeholder="Example: SJC-105"
+              />
+            </div>
+
+            {/* Full Name */}
+            <div className="col-md-6">
+              <label className="form-label">
+                Full Name
+              </label>
+
+              <input
+                type="text"
+                name="fullName"
+                className="form-control"
+                value={formData.fullName}
+                onChange={handleChange}
+                placeholder="Enter full name"
+              />
+            </div>
+
+            {/* Email */}
+            <div className="col-md-6">
+              <label className="form-label">
+                Email
+              </label>
+
+              <input
+                type="email"
+                name="email"
+                className="form-control"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="example@gmail.com"
+              />
+            </div>
+
+            {/* Phone */}
+            <div className="col-md-6">
+              <label className="form-label">
+                Phone
+              </label>
+
+              <input
+                type="tel"
+                name="phone"
+                className="form-control"
+                value={formData.phone}
+                onChange={handleChange}
+                placeholder="Enter phone number"
+              />
+            </div>
+
+            {/* Department */}
+            <div className="col-md-6">
+              <label className="form-label">
+                Department
+              </label>
+
+              <input
+                type="text"
+                name="department"
+                className="form-control"
+                value={formData.department}
+                onChange={handleChange}
+                placeholder="Example: Engineering"
+              />
+            </div>
+
+            {/* Role */}
+            <div className="col-md-6">
+              <label className="form-label">
+                Role / Designation
+              </label>
+
+              <input
+                type="text"
+                name="role"
+                className="form-control"
+                value={formData.role}
+                onChange={handleChange}
+                placeholder="Example: Software Intern"
+              />
+            </div>
+
+            {/* Status */}
+            <div className="col-md-6">
+              <label className="form-label">
+                Status
+              </label>
+
+              <select
+                name="status"
+                className="form-select"
+                value={formData.status}
+                onChange={handleChange}
+              >
+                <option value="ACTIVE">ACTIVE</option>
+                <option value="INACTIVE">INACTIVE</option>
+              </select>
+            </div>
+
           </div>
 
-          {/* Full Name */}
-          <div className="mb-3">
-            <label className="form-label">
-              Full Name
-            </label>
+          {/* Buttons */}
+          <div className="mt-4">
 
-            <input
-              type="text"
-              name="fullName"
-              className="form-control"
-              value={formData.fullName}
-              onChange={handleChange}
-              placeholder="Enter full name"
-            />
-          </div>
-
-          {/* Email */}
-          <div className="mb-3">
-            <label className="form-label">
-              Email
-            </label>
-
-            <input
-              type="email"
-              name="email"
-              className="form-control"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Enter email"
-            />
-          </div>
-
-          {/* Phone */}
-          <div className="mb-3">
-            <label className="form-label">
-              Phone
-            </label>
-
-            <input
-              type="tel"
-              name="phone"
-              className="form-control"
-              value={formData.phone}
-              onChange={handleChange}
-              placeholder="Enter phone number"
-            />
-          </div>
-
-          {/* Department */}
-          <div className="mb-3">
-            <label className="form-label">
-              Department
-            </label>
-
-            <input
-              type="text"
-              name="department"
-              className="form-control"
-              value={formData.department}
-              onChange={handleChange}
-              placeholder="Example: Engineering"
-            />
-          </div>
-
-          {/* Role */}
-          <div className="mb-3">
-            <label className="form-label">
-              Role
-            </label>
-
-            <input
-              type="text"
-              name="role"
-              className="form-control"
-              value={formData.role}
-              onChange={handleChange}
-              placeholder="Example: Software Intern"
-            />
-          </div>
-
-          {/* Status */}
-          <div className="mb-3">
-            <label className="form-label">
-              Status
-            </label>
-
-            <select
-              name="status"
-              className="form-select"
-              value={formData.status}
-              onChange={handleChange}
+            <button
+              type="submit"
+              className="btn btn-primary me-2"
             >
-              <option value="ACTIVE">ACTIVE</option>
-              <option value="INACTIVE">INACTIVE</option>
-            </select>
-          </div>
+              {selectedEmployee
+                ? "Update Employee"
+                : "Save Employee"}
+            </button>
 
-          <button
-            type="submit"
-            className="btn btn-primary"
-          >
-            Save Employee
-          </button>
+            {selectedEmployee && (
+              <button
+                type="button"
+                className="btn btn-outline-secondary"
+                onClick={handleCancel}
+              >
+                Cancel
+              </button>
+            )}
+
+          </div>
 
         </form>
+
       </div>
+
     </div>
   );
 }

@@ -37,3 +37,29 @@ export async function searchEmployees(query) {
 
   return await response.json();
 }
+
+export async function updateEmployee(id, employee) {
+  const response = await fetch(`${API_URL}/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(employee),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to update employee");
+  }
+
+  return await response.json();
+}
+
+export async function deleteEmployee(id) {
+  const response = await fetch(`${API_URL}/${id}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to delete employee");
+  }
+}
