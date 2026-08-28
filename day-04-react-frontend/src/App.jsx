@@ -1,10 +1,14 @@
-export default function App() {
-  return (
-    <div >
-      <h1 style={{ textAlign: "center" }}>Employee Management System </h1>
+import EmployeeForm from "./components/EmployeeForm";
 
-      <p style={{ textAlign: "center" }} > Day 4 - React Frontend </p>
+function App() {
+  return (
+    <div className="container">
+
+      <h1 className="text-title" style={{textAlign : "center"}}> Employee Management System </h1>
+      <EmployeeForm />
+      
     </div>
   );
 }
 
+export default App;
