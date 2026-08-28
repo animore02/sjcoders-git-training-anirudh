@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import EmployeeForm from "./components/EmployeeForm";
 import EmployeeList from "./components/EmployeeList";
-import { getEmployees } from "./services/employeeService";
+import EmployeeSearch from "./components/EmployeeSearch";
+import { getEmployees, searchEmployees } from "./services/employeeService";
 
 function App() {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+
 
   const loadEmployees = async () => {
     try {
@@ -23,9 +26,30 @@ function App() {
     }
   };
 
+
   useEffect(() => {
     loadEmployees();
   }, []);
+
+
+  const handleSearch = async (name) => {
+  try {
+    setLoading(true);
+    setError("");
+
+    const data = await searchEmployees(name);
+
+    setEmployees(data);
+  } catch (error) {
+    setError(error.message);
+  } finally {
+    setLoading(false);
+  }
+};
+
+const handleClearSearch = () => {
+  loadEmployees();
+};
 
   return (
     <div className="container mt-5 mb-5">
@@ -35,6 +59,11 @@ function App() {
       </h1>
 
       <EmployeeForm onEmployeeSaved={loadEmployees} />
+
+      <EmployeeSearch
+      onSearch={handleSearch}
+      onClear={handleClearSearch}
+    />
 
       {loading && (
         <div className="alert alert-info">

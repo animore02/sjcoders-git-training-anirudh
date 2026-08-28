@@ -25,3 +25,15 @@ export async function addEmployee(employee) {
 
   return await response.json();
 }
+
+export async function searchEmployees(query) {
+  const response = await fetch(
+    `${API_URL}/search?query=${encodeURIComponent(query)}`
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to search employees");
+  }
+
+  return await response.json();
+}
