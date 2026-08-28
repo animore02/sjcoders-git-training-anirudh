@@ -45,4 +45,24 @@ public class EmployeeController {
 
         return ResponseEntity.ok(employeeService.searchEmployees(query));
     }
+    @PutMapping("/{id}")
+    public ResponseEntity<Employee> updateEmployee(
+            @PathVariable Long id,
+            @RequestBody Employee employee) {
+
+        return employeeService.updateEmployee(id, employee)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteEmployee(
+            @PathVariable Long id) {
+
+        if (employeeService.deleteEmployee(id)) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.notFound().build();
+    }
 }
