@@ -1,0 +1,22 @@
+body {
+    background-color: #2C5745;
+}
+
+.card {
+    border-radius: 10px;
+    background-color: #EBE3A7;
+}
+
+.card-header {
+    font-weight: bold;
+    background-color: #EB7D00;
+}
+
+table {
+    vertical-align: middle;
+}
+
+
+#searchButton{
+    background-color: #8FA28A;
+}
