@@ -1,50 +1,74 @@
 import { useState } from "react";
+import { addEmployee } from "../services/employeeService";
 
-export default function EmployeeForm({ onEmployeeSaved }){
+function EmployeeForm({ onEmployeeSaved }) {
   const [formData, setFormData] = useState({
-    name: "",
+    employeeCode: "",
+    fullName: "",
     email: "",
-    department: "",
-    designation: "",
     phone: "",
+    department: "",
+    role: "",
+    status: "ACTIVE",
   });
 
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  const handleChange = (event)=>{
+  const handleChange = (event) => {
     const { name, value } = event.target;
+
     setFormData({
       ...formData,
       [name]: value,
     });
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
+    setError("");
+    setSuccess("");
+
     if (
-      !formData.name ||
+      !formData.employeeCode ||
+      !formData.fullName ||
       !formData.email ||
+      !formData.phone ||
       !formData.department ||
-      !formData.designation ||
-      !formData.phone
+      !formData.role
     ) {
-      setError("Please fill in all fields.");
+      setError("Please fill in all required fields.");
       return;
     }
 
-    setError("");
+    try {
+      const savedEmployee = await addEmployee(formData);
 
-    console.log("Employee:", formData);
+      console.log("Employee saved:", savedEmployee);
 
+      setSuccess("Employee added successfully!");
 
-    onEmployeeSaved?.();
+      setFormData({
+        employeeCode: "",
+        fullName: "",
+        email: "",
+        phone: "",
+        department: "",
+        role: "",
+        status: "ACTIVE",
+      });
+
+      onEmployeeSaved?.();
+    } catch (error) {
+      setError(error.message);
+    }
   };
 
   return (
-    <div>
+    <div className="card shadow-sm mb-4">
       <div className="card-body">
-        <h3 className="card-title">Add Employee</h3>
+        <h3 className="card-title mb-4">Add Employee</h3>
 
         {error && (
           <div className="alert alert-danger">
@@ -52,62 +76,68 @@ export default function EmployeeForm({ onEmployeeSaved }){
           </div>
         )}
 
+        {success && (
+          <div className="alert alert-success">
+            {success}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit}>
-          {/* Name */}
+
+          {/* Employee Code */}
           <div className="mb-3">
-            <label className="form-label">Name</label>
+            <label className="form-label">
+              Employee Code
+            </label>
+
             <input
               type="text"
-              name="name"
+              name="employeeCode"
               className="form-control"
-              value={formData.name}
+              value={formData.employeeCode}
               onChange={handleChange}
-              placeholder="Enter employee name"
+              placeholder="Example: SJC-105"
+            />
+          </div>
+
+          {/* Full Name */}
+          <div className="mb-3">
+            <label className="form-label">
+              Full Name
+            </label>
+
+            <input
+              type="text"
+              name="fullName"
+              className="form-control"
+              value={formData.fullName}
+              onChange={handleChange}
+              placeholder="Enter full name"
             />
           </div>
 
           {/* Email */}
           <div className="mb-3">
-            <label className="form-label">Email</label>
+            <label className="form-label">
+              Email
+            </label>
+
             <input
               type="email"
               name="email"
               className="form-control"
               value={formData.email}
               onChange={handleChange}
-              placeholder="Enter employee email"
-            />
-          </div>
-
-          {/* Department */}
-          <div className="mb-3">
-            <label className="form-label">Department</label>
-            <input
-              type="text"
-              name="department"
-              className="form-control"
-              value={formData.department}
-              onChange={handleChange}
-              placeholder="Enter department"
-            />
-          </div>
-
-          {/* Designation */}
-          <div className="mb-3">
-            <label className="form-label">Designation</label>
-            <input
-              type="text"
-              name="designation"
-              className="form-control"
-              value={formData.designation}
-              onChange={handleChange}
-              placeholder="Enter designation"
+              placeholder="Enter email"
             />
           </div>
 
           {/* Phone */}
           <div className="mb-3">
-            <label className="form-label">Phone</label>
+            <label className="form-label">
+              Phone
+            </label>
+
             <input
               type="tel"
               name="phone"
@@ -118,10 +148,66 @@ export default function EmployeeForm({ onEmployeeSaved }){
             />
           </div>
 
-          <button type="submit" className="btn btn-primary">Save Employee</button>
+          {/* Department */}
+          <div className="mb-3">
+            <label className="form-label">
+              Department
+            </label>
+
+            <input
+              type="text"
+              name="department"
+              className="form-control"
+              value={formData.department}
+              onChange={handleChange}
+              placeholder="Example: Engineering"
+            />
+          </div>
+
+          {/* Role */}
+          <div className="mb-3">
+            <label className="form-label">
+              Role
+            </label>
+
+            <input
+              type="text"
+              name="role"
+              className="form-control"
+              value={formData.role}
+              onChange={handleChange}
+              placeholder="Example: Software Intern"
+            />
+          </div>
+
+          {/* Status */}
+          <div className="mb-3">
+            <label className="form-label">
+              Status
+            </label>
+
+            <select
+              name="status"
+              className="form-select"
+              value={formData.status}
+              onChange={handleChange}
+            >
+              <option value="ACTIVE">ACTIVE</option>
+              <option value="INACTIVE">INACTIVE</option>
+            </select>
+          </div>
+
+          <button
+            type="submit"
+            className="btn btn-primary"
+          >
+            Save Employee
+          </button>
+
         </form>
       </div>
     </div>
   );
 }
 
+export default EmployeeForm;
