@@ -1,69 +1,159 @@
-# Day 3 - Employee Management
+# Day 3 + Day 5 – Employee Management
 
-This is a simple Employee Management project made as part of the SJ Coders training.
-The project has a frontend, backend, and MySQL database. 
-The frontend communicates with the backend using REST APIs.
+Employee Management REST API built during the SJ Coders training program.
 
-## Technologies Used
-- HTML
-- CSS
-- JavaScript
-- Java
-- Spring Boot
-- Spring Data JPA
-- Hibernate
+Day 5 focuses on securing the backend using Spring Security and JWT. I also added
+BCrypt password hashing, request validation, role-based access control and global
+exception handling.
+
+## Technologies
+
+- Java 21
+- Spring Boot 4.1
+- Spring Security
+- JWT (JJWT 0.12.6)
+- Spring Data JPA / Hibernate
 - MySQL
+- BCrypt
+- Jakarta Bean Validation
 - Postman
 
-## Features:
-- Add a new employee
-- View all employees
-- Find employee by ID
-- Search employees by name or employee code
-- Store employee data in MySQL
+---
 
-## Employee Details
-The employee contains:
+## Authentication
 
-- ID
-- Employee Code
-- Full Name
-- Email
-- Phone
-- Department
-- Role
-- Status
+The application uses JWT-based authentication.
 
-## API Endpoints
-| POST | /api/employees | Add employee |
-| GET | /api/employees | Get all employees |
-| GET | /api/employees/id | Get employee by ID |
-| GET | /api/employees/search?query=text | Search employee |
+Basic flow:
 
-## Database
+```text
+Register
+   ↓
+Password is hashed using BCrypt
+   ↓
+User is saved
+   ↓
+Login
+   ↓
+Credentials are checked
+   ↓
+JWT token is generated
+   ↓
+Token is used for protected APIs
+```
 
-Database name: `sjcoders_training`
-Table name: `employee`
+Protected endpoints expect the token in the request header:
+
+```text
+Authorization: Bearer <token>
+```
 
 ## How to Run
 
-### Backend
+1. Go to the backend folder:
 
-Go to the backend folder:
--cd backend
--run command: .\mvnw.cmd spring-boot:run
+   ```bash
+   cd day-03-employee-management/backend
+   ```
 
-## frontend
--run frontend
+2. Run the application:
 
-## Postman
--Postman collection is available in: postman/employee-management-api.json
+   ```bash
+   .\mvnw.cmd spring-boot:run
+   ```
 
-## project structure 
+3. The server runs on: http://localhost:8080
+
+4. Database configuration — create a `.env` file inside the backend folder:
+
+   ```env
+   DB_USERNAME=your_mysql_username
+   DB_PASSWORD=your_mysql_password
+   ```
+
+5. Database used: `sjcoders_training`
+
+Make sure MySQL is running before starting the application.
+
+## Project Structure
+
+```text
 day-03-employee-management/
 │
 ├── backend/
+│   └── src/main/java/com/sjcoders/training/
+│       ├── config/
+│       │   └── SecurityConfig.java
+│       │
+│       ├── controller/
+│       │   ├── AuthController.java
+│       │   └── EmployeeController.java
+│       │
+│       ├── dto/
+│       │   ├── LoginRequest.java
+│       │   ├── RegisterRequest.java
+│       │   ├── RegisterResponse.java
+│       │   ├── EmployeeRequest.java
+│       │   └── EmployeeResponse.java
+│       │
+│       ├── exception/
+│       │   ├── GlobalExceptionHandler.java
+│       │   ├── InvalidCredentialsException.java
+│       │   ├── ResourceNotFoundException.java
+│       │   └── DuplicateEmailException.java
+│       │
+│       ├── model/
+│       │   ├── User.java
+│       │   └── Employee.java
+│       │
+│       ├── repository/
+│       │   ├── UserRepository.java
+│       │   └── EmployeeRepository.java
+│       │
+│       ├── security/
+│       │   ├── JwtService.java
+│       │   └── JwtAuthenticationFilter.java
+│       │
+│       └── service/
+│           ├── AuthService.java
+│           └── EmployeeService.java
+│
 ├── frontend/
-├── postman/
+├── Postman/
 ├── screenshots/
 └── README.md
+```
+
+## Screenshots
+
+Postman testing screenshots are available in the `screenshots/` folder.
+
+The screenshots demonstrate:
+
+- User registration and login
+- JWT authentication
+- ADMIN employee operations
+- USER read-only access
+- 401 Unauthorized
+- 403 Forbidden
+- 400 Bad Request
+- 404 Not Found
+
+## Day 5 Summary
+
+In Day 5, I added security and validation to the Employee Management API.
+
+Main things implemented:
+
+- JWT authentication
+- BCrypt password hashing
+- Spring Security
+- ADMIN and USER roles
+- Protected employee APIs
+- DTOs and request validation
+- Global exception handling
+- HTTP status handling
+- Postman testing
+
+The final result is that a USER can log in and view employee data, while an
+ADMIN can add, edit and delete employees.
