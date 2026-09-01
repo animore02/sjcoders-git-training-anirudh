@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class EmployeeService{
+public class EmployeeService {
 
     private final EmployeeRepository employeeRepository;
 
@@ -32,5 +32,54 @@ public class EmployeeService{
         return employeeRepository
                 .findByFullNameContainingIgnoreCaseOrEmployeeCodeContainingIgnoreCase(
                         query, query);
+    }
+
+    // UPDATE
+    public Optional<Employee> updateEmployee(Long id, Employee employee) {
+
+        return employeeRepository.findById(id)
+                .map(existingEmployee -> {
+
+                    existingEmployee.setEmployeeCode(
+                            employee.getEmployeeCode()
+                    );
+
+                    existingEmployee.setFullName(
+                            employee.getFullName()
+                    );
+
+                    existingEmployee.setEmail(
+                            employee.getEmail()
+                    );
+
+                    existingEmployee.setPhone(
+                            employee.getPhone()
+                    );
+
+                    existingEmployee.setDepartment(
+                            employee.getDepartment()
+                    );
+
+                    existingEmployee.setRole(
+                            employee.getRole()
+                    );
+
+                    existingEmployee.setStatus(
+                            employee.getStatus()
+                    );
+
+                    return employeeRepository.save(existingEmployee);
+                });
+    }
+
+    // DELETE
+    public boolean deleteEmployee(Long id) {
+
+        if (!employeeRepository.existsById(id)) {
+            return false;
+        }
+
+        employeeRepository.deleteById(id);
+        return true;
     }
 }
